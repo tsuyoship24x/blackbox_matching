@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>DM</h2>
+  <ul>
+  {% for m in messages %}
+    <li>{{ m.user.username }}: {{ m.content }} ({{ m.timestamp }})</li>
+  {% endfor %}
+  </ul>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <p>{{ form.message.label }}<br>{{ form.message() }}</p>
+    <p>{{ form.submit() }}</p>
+  </form>
+{% endblock %}

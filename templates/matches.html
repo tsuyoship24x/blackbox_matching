@@ -7,6 +7,7 @@
       <li>
         {{ r.start }} - {{ r.end }} ({{ r.hours|round(2) }}h) -
         {{ r.friend.username }}さんと「{{ r.category }}」
+        <a href="{{ url_for('chat', room_id=r.room_id) }}">DM</a>
       </li>
     {% endfor %}
     </ul>
