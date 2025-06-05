@@ -26,6 +26,13 @@ match_who_assoc = db.Table('match_who_assoc',
     db.Column('who_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
 )
 
+# DM chat room relations
+chat_room_members = db.Table(
+    'chat_room_members',
+    db.Column('room_id', db.Integer, db.ForeignKey('chat_room.id'), primary_key=True),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
 CATEGORIES = [
     ('飲み会', '飲み会'),
     ('スポーツ', 'スポーツ'),
@@ -86,6 +93,23 @@ class MatchTimeRange(db.Model):
     start_time = db.Column(db.DateTime, nullable=False)
     end_time = db.Column(db.DateTime, nullable=False)
 
+
+class ChatRoom(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+    members = db.relationship('User', secondary=chat_room_members, backref='chat_rooms')
+
+
+class ChatMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    room_id = db.Column(db.Integer, db.ForeignKey('chat_room.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
+    room = db.relationship('ChatRoom', backref='messages')
+    user = db.relationship('User')
+
 class RegistrationForm(FlaskForm):
     username = StringField('ユーザー名', validators=[DataRequired()])
     password = PasswordField('パスワード', validators=[DataRequired()])
@@ -107,6 +131,11 @@ class MatchForm(FlaskForm):
     who = SelectMultipleField('誰と', coerce=int, validators=[DataRequired()])
     activity_hours = IntegerField('活動時間（時間）', validators=[DataRequired()])
     submit = SubmitField('登録')
+
+
+class ChatForm(FlaskForm):
+    message = StringField('メッセージ', validators=[DataRequired()])
+    submit = SubmitField('送信')
 
 @app.before_first_request
 def init_db():
@@ -261,14 +290,40 @@ def matches():
                                 overlap = (end - start).total_seconds() / 3600
                                 required = max(my_req.activity_hours, o_req.activity_hours)
                                 if overlap >= required:
+                                    room = ChatRoom.query.filter(ChatRoom.members.contains(current_user),
+                                                                 ChatRoom.members.contains(who)).first()
+                                    if not room:
+                                        room = ChatRoom()
+                                        room.members.append(current_user)
+                                        room.members.append(who)
+                                        db.session.add(room)
+                                        db.session.commit()
                                     results.append({
                                         'friend': who,
                                         'category': my_req.category,
                                         'start': start,
                                         'end': end,
-                                        'hours': overlap
+                                        'hours': overlap,
+                                        'room_id': room.id
                                     })
     return render_template('matches.html', results=results)
+
+
+@app.route('/chat/<int:room_id>', methods=['GET', 'POST'])
+@login_required
+def chat(room_id):
+    room = ChatRoom.query.get_or_404(room_id)
+    if current_user not in room.members:
+        flash('アクセスできません。')
+        return redirect(url_for('matches'))
+    form = ChatForm()
+    if form.validate_on_submit():
+        msg = ChatMessage(room=room, user=current_user, content=form.message.data)
+        db.session.add(msg)
+        db.session.commit()
+        return redirect(url_for('chat', room_id=room.id))
+    messages = ChatMessage.query.filter_by(room=room).order_by(ChatMessage.timestamp).all()
+    return render_template('chat.html', form=form, messages=messages, room=room)
 
 if __name__ == '__main__':
     app.run(debug=True)
