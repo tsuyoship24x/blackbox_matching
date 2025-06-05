@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>マッチング希望登録</h2>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <div id="ranges-container">
+      <div class="time-range">
+        <label>開始日時</label><br>
+        <input type="datetime-local" name="range_start" required><br>
+        <label>終了日時</label><br>
+        <input type="datetime-local" name="range_end" required><br>
+      </div>
+    </div>
+    <button type="button" id="add-range">範囲を追加</button>
+    <p>{{ form.category.label }}<br>{{ form.category() }}</p>
+    <p>{{ form.who.label }}<br>{{ form.who() }}</p>
+    <p>{{ form.activity_hours.label }}<br>{{ form.activity_hours() }}</p>
+    <p>{{ form.submit() }}</p>
+  </form>
+  <script>
+    document.getElementById('add-range').addEventListener('click', function() {
+      var container = document.getElementById('ranges-container');
+      var block = container.querySelector('.time-range');
+      var clone = block.cloneNode(true);
+      clone.querySelector('input[name="range_start"]').value = '';
+      clone.querySelector('input[name="range_end"]').value = '';
+      container.appendChild(clone);
+    });
+  </script>
+{% endblock %}

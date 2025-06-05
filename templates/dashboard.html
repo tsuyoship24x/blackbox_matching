@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>ダッシュボード</h2>
+  <ul>
+    <li><a href="{{ url_for('add_friend') }}">友達を追加</a></li>
+    <li><a href="{{ url_for('create_match') }}">マッチング希望を登録</a></li>
+    <li><a href="{{ url_for('matches') }}">マッチ一覧</a></li>
+  </ul>
+{% endblock %}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>マッチングサービス</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% if current_user.is_authenticated %}
+      <p>ようこそ、{{ current_user.username }} | <a href="{{ url_for('dashboard') }}">ダッシュボード</a> | <a href="{{ url_for('add_friend') }}">友達追加</a> | <a href="{{ url_for('create_match') }}">マッチ登録</a> | <a href="{{ url_for('matches') }}">マッチ一覧</a> | <a href="{{ url_for('logout') }}">ログアウト</a></p>
+    {% endif %}
+    {% block content %}{% endblock %}
+</body>
+</html>

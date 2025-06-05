@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>マッチ一覧</h2>
+  {% if results %}
+    <ul>
+    {% for r in results %}
+      <li>
+        {{ r.start }} - {{ r.end }} ({{ r.hours|round(2) }}h) -
+        {{ r.friend.username }}さんと「{{ r.category }}」
+      </li>
+    {% endfor %}
+    </ul>
+  {% else %}
+    <p>マッチはありません。</p>
+  {% endif %}
+{% endblock %}

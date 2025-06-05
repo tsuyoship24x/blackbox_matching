@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>ログイン</h2>
+  <form method="post">
+    {{ form.hidden_tag() }}
+    <p>{{ form.username.label }}<br>{{ form.username() }}</p>
+    <p>{{ form.password.label }}<br>{{ form.password() }}</p>
+    <p>{{ form.submit() }}</p>
+  </form>
+  <p>アカウントがありませんか？ <a href="{{ url_for('register') }}">登録</a></p>
+{% endblock %}

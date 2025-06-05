@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>友達追加</h2>
+  <form method="post">
+    <input type="text" name="search" placeholder="ユーザー名で検索" value="{{ search }}">
+    <input type="submit" value="検索">
+  </form>
+  {% if users %}
+    <ul>
+    {% for u in users %}
+      <li>{{ u.username }} - <a href="{{ url_for('send_friend_request', user_id=u.id) }}">追加</a></li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endblock %}
