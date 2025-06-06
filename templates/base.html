@@ -3,40 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <title>マッチングサービス</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-R9Y6Fw5Jo2Qb1zOEx+kt1lEuzMdGII4XESyqHRpt5TR1+t0NenE2no0LYvr10+kv" crossorigin="anonymous">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="{{ url_for('dashboard') }}">マッチングサービス</a>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+<body class="bg-gray-100 min-h-screen flex flex-col">
+<nav class="bg-white shadow mb-8">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between py-4">
+      <a href="{{ url_for('dashboard') }}" class="text-xl font-semibold">マッチングサービス</a>
+      <div>
         {% if current_user.is_authenticated %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">ダッシュボード</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('add_friend') }}">友達追加</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('create_match') }}">マッチ登録</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('matches') }}">マッチ一覧</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">ログアウト</a></li>
+          <a href="{{ url_for('dashboard') }}" class="text-gray-700 hover:text-indigo-600 mr-4">ダッシュボード</a>
+          <a href="{{ url_for('add_friend') }}" class="text-gray-700 hover:text-indigo-600 mr-4">友達追加</a>
+          <a href="{{ url_for('create_match') }}" class="text-gray-700 hover:text-indigo-600 mr-4">マッチ登録</a>
+          <a href="{{ url_for('matches') }}" class="text-gray-700 hover:text-indigo-600 mr-4">マッチ一覧</a>
+          <a href="{{ url_for('logout') }}" class="text-gray-700 hover:text-indigo-600">ログアウト</a>
         {% else %}
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">ログイン</a></li>
-          <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">登録</a></li>
+          <a href="{{ url_for('login') }}" class="text-gray-700 hover:text-indigo-600 mr-4">ログイン</a>
+          <a href="{{ url_for('register') }}" class="text-gray-700 hover:text-indigo-600">登録</a>
         {% endif %}
-      </ul>
+      </div>
     </div>
   </div>
 </nav>
-<div class="container">
+<div class="container mx-auto px-4 flex-1">
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <div class="alert alert-info">
+        <div class="bg-indigo-100 border-l-4 border-indigo-500 text-indigo-700 p-4 mb-4">
         {% for msg in messages %}
-          <p class="mb-0">{{ msg }}</p>
-        {% endfor %}
+          <p>{{ msg }}</p>
         </div>
       {% endif %}
     {% endwith %}
     {% block content %}{% endblock %}
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-HTfbvZW8DqRLVQjaxAg/P6MqxsVXni4eWh05rq6ArtyTcidH8333AdxAi8uKXu95" crossorigin="anonymous"></script>
 </body>
 </html>
