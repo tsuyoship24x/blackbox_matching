@@ -1,15 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>友達追加</h2>
-  <form method="post">
-    <input type="text" name="search" placeholder="ユーザー名で検索" value="{{ search }}">
-    <input type="submit" value="検索">
-  </form>
-  {% if users %}
-    <ul>
-    {% for u in users %}
-      <li>{{ u.username }} - <a href="{{ url_for('send_friend_request', user_id=u.id) }}">追加</a></li>
-    {% endfor %}
-    </ul>
-  {% endif %}
+  <div class="max-w-xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-4">友達追加</h2>
+    <form method="post" class="flex mb-6">
+      <input type="text" class="flex-grow rounded-l border border-gray-300 p-2" name="search" placeholder="ユーザー名で検索" value="{{ search }}">
+      <button class="bg-indigo-500 text-white px-4 rounded-r" type="submit">検索</button>
+    </form>
+    {% if users %}
+      <ul class="divide-y divide-gray-200 bg-white shadow rounded">
+      {% for u in users %}
+        <li class="p-4 flex items-center justify-between">
+          {{ u.username }}
+          <a class="text-sm text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1 rounded" href="{{ url_for('send_friend_request', user_id=u.id) }}">追加</a>
+        </li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+  </div>
 {% endblock %}

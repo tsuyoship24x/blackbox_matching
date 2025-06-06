@@ -1,23 +1,37 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>マッチング希望登録</h2>
-  <form method="post">
-    {{ form.hidden_tag() }}
-    <div id="ranges-container">
-      <div class="time-range">
-        <label>開始日時</label><br>
-        <input type="datetime-local" name="range_start" required><br>
-        <label>終了日時</label><br>
-        <input type="datetime-local" name="range_end" required><br>
+  <div class="max-w-xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-4">マッチング希望登録</h2>
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <div id="ranges-container">
+        <div class="time-range mb-4">
+          <label class="block text-sm font-medium text-gray-700">開始日時</label>
+          <input type="datetime-local" class="mt-1 w-full border rounded p-2" name="range_start" required>
+          <label class="block text-sm font-medium text-gray-700 mt-2">終了日時</label>
+          <input type="datetime-local" class="mt-1 w-full border rounded p-2" name="range_end" required>
+        </div>
       </div>
-    </div>
-    <button type="button" id="add-range">範囲を追加</button>
-    <p>{{ form.category.label }}<br>{{ form.category() }}</p>
-    <p>{{ form.num_people.label }}<br>{{ form.num_people() }}</p>
-    <p>{{ form.who.label }}<br>{{ form.who() }}</p>
-    <p>{{ form.activity_hours.label }}<br>{{ form.activity_hours() }}</p>
-    <p>{{ form.submit() }}</p>
-  </form>
+      <button type="button" class="bg-gray-200 text-gray-800 px-3 py-1 rounded mb-4" id="add-range">範囲を追加</button>
+      <div class="mb-4">
+        {{ form.category.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.category(class="mt-1 w-full border rounded p-2") }}
+      </div>
+      <div class="mb-4">
+        {{ form.num_people.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.num_people(class="mt-1 w-full border rounded p-2") }}
+      </div>
+      <div class="mb-4">
+        {{ form.who.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.who(class="mt-1 w-full border rounded p-2", multiple=True) }}
+      </div>
+      <div class="mb-4">
+        {{ form.activity_hours.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.activity_hours(class="mt-1 w-full border rounded p-2") }}
+      </div>
+      {{ form.submit(class="bg-indigo-500 text-white px-4 py-2 rounded") }}
+    </form>
+  </div>
   <script>
     document.getElementById('add-range').addEventListener('click', function() {
       var container = document.getElementById('ranges-container');

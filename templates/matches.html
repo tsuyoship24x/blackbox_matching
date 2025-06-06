@@ -1,17 +1,21 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>マッチ一覧</h2>
-  {% if results %}
-    <ul>
-    {% for r in results %}
-      <li>
-        {{ r.start }} - {{ r.end }} ({{ r.hours|round(2) }}h) -
-        {{ r.friend.username }}さんと「{{ r.category }}」
-        <a href="{{ url_for('chat', room_id=r.room_id) }}">DM</a>
-      </li>
-    {% endfor %}
-    </ul>
-  {% else %}
-    <p>マッチはありません。</p>
-  {% endif %}
+  <div class="max-w-3xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-4">マッチ一覧</h2>
+    {% if results %}
+      <ul class="divide-y divide-gray-200 bg-white rounded shadow">
+      {% for r in results %}
+        <li class="p-4 flex items-center justify-between">
+          <div>
+            {{ r.start }} - {{ r.end }} ({{ r.hours|round(2) }}h) -
+            {{ r.friend.username }}さんと「{{ r.category }}」
+          </div>
+          <a href="{{ url_for('chat', room_id=r.room_id) }}" class="text-sm text-white bg-indigo-500 hover:bg-indigo-600 px-3 py-1 rounded">DM</a>
+        </li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p>マッチはありません。</p>
+    {% endif %}
+  </div>
 {% endblock %}

@@ -1,12 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>ユーザー登録</h2>
-  <form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.username.label }}<br>{{ form.username() }}</p>
-    <p>{{ form.password.label }}<br>{{ form.password() }}</p>
-    <p>{{ form.password2.label }}<br>{{ form.password2() }}</p>
-    <p>{{ form.submit() }}</p>
-  </form>
-  <p>既にアカウントをお持ちですか？ <a href="{{ url_for('login') }}">ログイン</a></p>
+  <div class="max-w-sm mx-auto">
+    <h2 class="text-2xl font-semibold mb-4">ユーザー登録</h2>
+    <form method="post" class="space-y-4">
+      {{ form.hidden_tag() }}
+      <div>
+        {{ form.username.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.username(class="mt-1 w-full border rounded p-2") }}
+      </div>
+      <div>
+        {{ form.password.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.password(class="mt-1 w-full border rounded p-2") }}
+      </div>
+      <div>
+        {{ form.password2.label(class="block text-sm font-medium text-gray-700") }}
+        {{ form.password2(class="mt-1 w-full border rounded p-2") }}
+      </div>
+      {{ form.submit(class="bg-indigo-500 text-white px-4 py-2 rounded") }}
+    </form>
+    <p class="mt-4 text-center">既にアカウントをお持ちですか？ <a href="{{ url_for('login') }}" class="text-indigo-600 underline">ログイン</a></p>
+  </div>
 {% endblock %}
