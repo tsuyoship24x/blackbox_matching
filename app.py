@@ -73,6 +73,8 @@ class MatchRequest(db.Model):
     category = db.Column(db.String(64), nullable=False)
     # required activity duration in hours
     activity_hours = db.Column(db.Integer, nullable=False)
+    # desired number of people
+    num_people = db.Column(db.Integer, nullable=False, default=1)
     # record creation time (new column)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
@@ -129,6 +131,7 @@ class LoginForm(FlaskForm):
 class MatchForm(FlaskForm):
     category = SelectField('何を', choices=CATEGORIES, validators=[DataRequired()])
     who = SelectMultipleField('誰と', coerce=int, validators=[DataRequired()])
+    num_people = IntegerField('人数', validators=[DataRequired()])
     activity_hours = IntegerField('活動時間（時間）', validators=[DataRequired()])
     submit = SubmitField('登録')
 
@@ -166,6 +169,16 @@ def init_db():
             # backfill any NULL occur_time using created_at
             db.session.execute(
                 "UPDATE match_request SET occur_time = created_at WHERE occur_time IS NULL"
+            )
+            db.session.commit()
+    except Exception:
+        pass
+    # 3) Add num_people column if missing
+    try:
+        cols = [row[1] for row in db.session.execute("PRAGMA table_info('match_request')")]
+        if 'num_people' not in cols:
+            db.session.execute(
+                "ALTER TABLE match_request ADD COLUMN num_people INTEGER NOT NULL DEFAULT 1"
             )
             db.session.commit()
     except Exception:
@@ -250,7 +263,8 @@ def create_match():
         mr = MatchRequest(
             user=current_user,
             category=form.category.data,
-            activity_hours=form.activity_hours.data
+            activity_hours=form.activity_hours.data,
+            num_people=form.num_people.data
         )
         # associate friends
         for fid in form.who.data:
