@@ -73,8 +73,9 @@ class MatchRequest(db.Model):
     category = db.Column(db.String(64), nullable=False)
     # required activity duration in hours
     activity_hours = db.Column(db.Integer, nullable=False)
-    # desired number of people
-    num_people = db.Column(db.Integer, nullable=False, default=1)
+    # minimum and maximum number of participants desired
+    min_people = db.Column(db.Integer, nullable=False, default=1)
+    max_people = db.Column(db.Integer, nullable=False, default=1)
     # record creation time (new column)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow)
 
@@ -131,9 +132,14 @@ class LoginForm(FlaskForm):
 class MatchForm(FlaskForm):
     category = SelectField('何を', choices=CATEGORIES, validators=[DataRequired()])
     who = SelectMultipleField('誰と', coerce=int, validators=[DataRequired()])
-    num_people = IntegerField('人数', validators=[DataRequired()])
+    min_people = IntegerField('最低人数', validators=[DataRequired()])
+    max_people = IntegerField('上限人数', validators=[DataRequired()])
     activity_hours = IntegerField('活動時間（時間）', validators=[DataRequired()])
     submit = SubmitField('登録')
+
+    def validate_max_people(self, field):
+        if self.min_people.data and field.data < self.min_people.data:
+            raise ValidationError('上限人数は最低人数以上で指定してください。')
 
 
 class ChatForm(FlaskForm):
@@ -173,12 +179,17 @@ def init_db():
             db.session.commit()
     except Exception:
         pass
-    # 3) Add num_people column if missing
+    # 3) Add min_people and max_people columns if missing
     try:
         cols = [row[1] for row in db.session.execute("PRAGMA table_info('match_request')")]
-        if 'num_people' not in cols:
+        if 'min_people' not in cols:
             db.session.execute(
-                "ALTER TABLE match_request ADD COLUMN num_people INTEGER NOT NULL DEFAULT 1"
+                "ALTER TABLE match_request ADD COLUMN min_people INTEGER NOT NULL DEFAULT 1"
+            )
+            db.session.commit()
+        if 'max_people' not in cols:
+            db.session.execute(
+                "ALTER TABLE match_request ADD COLUMN max_people INTEGER NOT NULL DEFAULT 1"
             )
             db.session.commit()
     except Exception:
@@ -264,7 +275,8 @@ def create_match():
             user=current_user,
             category=form.category.data,
             activity_hours=form.activity_hours.data,
-            num_people=form.num_people.data
+            min_people=form.min_people.data,
+            max_people=form.max_people.data
         )
         # associate friends
         for fid in form.who.data:
@@ -291,11 +303,15 @@ def create_match():
 def matches():
     results = []
     for my_req in current_user.match_requests:
+        members = [current_user]
+        start_times = []
+        end_times = []
+        other_reqs = []
         for who in my_req.who:
-            # same category
             others = MatchRequest.query.filter_by(user_id=who.id, category=my_req.category).all()
             for o_req in others:
                 if current_user in o_req.who:
+                    matched = False
                     for my_tr in my_req.time_ranges:
                         for other_tr in o_req.time_ranges:
                             start = max(my_tr.start_time, other_tr.start_time)
@@ -304,22 +320,48 @@ def matches():
                                 overlap = (end - start).total_seconds() / 3600
                                 required = max(my_req.activity_hours, o_req.activity_hours)
                                 if overlap >= required:
-                                    room = ChatRoom.query.filter(ChatRoom.members.contains(current_user),
-                                                                 ChatRoom.members.contains(who)).first()
-                                    if not room:
-                                        room = ChatRoom()
-                                        room.members.append(current_user)
-                                        room.members.append(who)
-                                        db.session.add(room)
-                                        db.session.commit()
-                                    results.append({
-                                        'friend': who,
-                                        'category': my_req.category,
-                                        'start': start,
-                                        'end': end,
-                                        'hours': overlap,
-                                        'room_id': room.id
-                                    })
+                                    members.append(who)
+                                    start_times.append(start)
+                                    end_times.append(end)
+                                    other_reqs.append(o_req)
+                                    matched = True
+                                    break
+                        if matched:
+                            break
+                if who in members:
+                    break
+        group_size = len(members)
+        if group_size < my_req.min_people or group_size > my_req.max_people:
+            continue
+        ok = True
+        for o_req in other_reqs:
+            if group_size < o_req.min_people or group_size > o_req.max_people:
+                ok = False
+                break
+        if not ok or not start_times:
+            continue
+        start = max(start_times)
+        end = min(end_times)
+        if end <= start:
+            continue
+        room_query = ChatRoom.query
+        for m in members:
+            room_query = room_query.filter(ChatRoom.members.contains(m))
+        room = room_query.first()
+        if not room:
+            room = ChatRoom()
+            for m in members:
+                room.members.append(m)
+            db.session.add(room)
+            db.session.commit()
+        results.append({
+            'friends': [m.username for m in members if m != current_user],
+            'category': my_req.category,
+            'start': start,
+            'end': end,
+            'hours': (end - start).total_seconds() / 3600,
+            'room_id': room.id
+        })
     return render_template('matches.html', results=results)
 
 
