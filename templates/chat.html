@@ -1,14 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>DM</h2>
-  <ul>
-  {% for m in messages %}
-    <li>{{ m.user.username }}: {{ m.content }} ({{ m.timestamp }})</li>
-  {% endfor %}
-  </ul>
-  <form method="post">
-    {{ form.hidden_tag() }}
-    <p>{{ form.message.label }}<br>{{ form.message() }}</p>
-    <p>{{ form.submit() }}</p>
-  </form>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h2 class="mb-4">DM</h2>
+      <ul class="list-group mb-3">
+      {% for m in messages %}
+        <li class="list-group-item">
+          <strong>{{ m.user.username }}</strong>: {{ m.content }} <small class="text-muted">({{ m.timestamp }})</small>
+        </li>
+      {% endfor %}
+      </ul>
+      <form method="post" class="input-group">
+        {{ form.hidden_tag() }}
+        {{ form.message(class="form-control") }}
+        <button class="btn btn-primary" type="submit">送信</button>
+      </form>
+    </div>
+  </div>
 {% endblock %}

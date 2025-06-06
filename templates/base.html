@@ -3,20 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <title>マッチングサービス</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-R9Y6Fw5Jo2Qb1zOEx+kt1lEuzMdGII4XESyqHRpt5TR1+t0NenE2no0LYvr10+kv" crossorigin="anonymous">
 </head>
 <body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ url_for('dashboard') }}">マッチングサービス</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        {% if current_user.is_authenticated %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('dashboard') }}">ダッシュボード</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('add_friend') }}">友達追加</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('create_match') }}">マッチ登録</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('matches') }}">マッチ一覧</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">ログアウト</a></li>
+        {% else %}
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">ログイン</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">登録</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+<div class="container">
     {% with messages = get_flashed_messages() %}
       {% if messages %}
-        <ul>
+        <div class="alert alert-info">
         {% for msg in messages %}
-          <li>{{ msg }}</li>
+          <p class="mb-0">{{ msg }}</p>
         {% endfor %}
-        </ul>
+        </div>
       {% endif %}
     {% endwith %}
-    {% if current_user.is_authenticated %}
-      <p>ようこそ、{{ current_user.username }} | <a href="{{ url_for('dashboard') }}">ダッシュボード</a> | <a href="{{ url_for('add_friend') }}">友達追加</a> | <a href="{{ url_for('create_match') }}">マッチ登録</a> | <a href="{{ url_for('matches') }}">マッチ一覧</a> | <a href="{{ url_for('logout') }}">ログアウト</a></p>
-    {% endif %}
     {% block content %}{% endblock %}
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-HTfbvZW8DqRLVQjaxAg/P6MqxsVXni4eWh05rq6ArtyTcidH8333AdxAi8uKXu95" crossorigin="anonymous"></script>
 </body>
 </html>

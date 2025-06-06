@@ -1,23 +1,39 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>マッチング希望登録</h2>
-  <form method="post">
-    {{ form.hidden_tag() }}
-    <div id="ranges-container">
-      <div class="time-range">
-        <label>開始日時</label><br>
-        <input type="datetime-local" name="range_start" required><br>
-        <label>終了日時</label><br>
-        <input type="datetime-local" name="range_end" required><br>
-      </div>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <h2 class="mb-4">マッチング希望登録</h2>
+      <form method="post">
+        {{ form.hidden_tag() }}
+        <div id="ranges-container">
+          <div class="time-range mb-3">
+            <label class="form-label">開始日時</label>
+            <input type="datetime-local" class="form-control" name="range_start" required>
+            <label class="form-label mt-2">終了日時</label>
+            <input type="datetime-local" class="form-control" name="range_end" required>
+          </div>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm mb-3" id="add-range">範囲を追加</button>
+        <div class="mb-3">
+          {{ form.category.label(class="form-label") }}
+          {{ form.category(class="form-select") }}
+        </div>
+        <div class="mb-3">
+          {{ form.num_people.label(class="form-label") }}
+          {{ form.num_people(class="form-control") }}
+        </div>
+        <div class="mb-3">
+          {{ form.who.label(class="form-label") }}
+          {{ form.who(class="form-select", multiple=True) }}
+        </div>
+        <div class="mb-3">
+          {{ form.activity_hours.label(class="form-label") }}
+          {{ form.activity_hours(class="form-control") }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+      </form>
     </div>
-    <button type="button" id="add-range">範囲を追加</button>
-    <p>{{ form.category.label }}<br>{{ form.category() }}</p>
-    <p>{{ form.num_people.label }}<br>{{ form.num_people() }}</p>
-    <p>{{ form.who.label }}<br>{{ form.who() }}</p>
-    <p>{{ form.activity_hours.label }}<br>{{ form.activity_hours() }}</p>
-    <p>{{ form.submit() }}</p>
-  </form>
+  </div>
   <script>
     document.getElementById('add-range').addEventListener('click', function() {
       var container = document.getElementById('ranges-container');

@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
-  <h2>ダッシュボード</h2>
-  <ul>
-    <li><a href="{{ url_for('add_friend') }}">友達を追加</a></li>
-    <li><a href="{{ url_for('create_match') }}">マッチング希望を登録</a></li>
-    <li><a href="{{ url_for('matches') }}">マッチ一覧</a></li>
-  </ul>
+  <div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+      <h2 class="mb-4">ダッシュボード</h2>
+      <div class="list-group">
+        <a href="{{ url_for('add_friend') }}" class="list-group-item list-group-item-action">友達を追加</a>
+        <a href="{{ url_for('create_match') }}" class="list-group-item list-group-item-action">マッチング希望を登録</a>
+        <a href="{{ url_for('matches') }}" class="list-group-item list-group-item-action">マッチ一覧</a>
+      </div>
+    </div>
+  </div>
 {% endblock %}
