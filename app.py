@@ -184,14 +184,22 @@ def init_db():
         cols = [row[1] for row in db.session.execute("PRAGMA table_info('match_request')")]
         if 'min_people' not in cols:
             db.session.execute(
-                "ALTER TABLE match_request ADD COLUMN min_people INTEGER NOT NULL DEFAULT 1"
+                "ALTER TABLE match_request ADD COLUMN min_people INTEGER NOT NULL DEFAULT 2"
             )
             db.session.commit()
+        db.session.execute(
+            "UPDATE match_request SET min_people = 2 WHERE min_people IS NULL OR min_people < 2"
+        )
+        db.session.commit()
         if 'max_people' not in cols:
             db.session.execute(
-                "ALTER TABLE match_request ADD COLUMN max_people INTEGER NOT NULL DEFAULT 1"
+                "ALTER TABLE match_request ADD COLUMN max_people INTEGER NOT NULL DEFAULT 2"
             )
             db.session.commit()
+        db.session.execute(
+            "UPDATE match_request SET max_people = 2 WHERE max_people IS NULL OR max_people < 2"
+        )
+        db.session.commit()
     except Exception:
         pass
 
